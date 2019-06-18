@@ -197,6 +197,8 @@ bindsym $mod+Shift+d mode "$mode_screen"
 
 # natural scroll
 exec synclient VertScrollDelta=-27
+exec synclient HorizTwoFingerScroll=1
+exec synclient HorizScrollDelta=-27
 
 # lock i3
 bindsym $mod+Shift+x exec i3lock
