@@ -17,7 +17,7 @@ font pango:monospace 8
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-#font pango:DejaVu Sans Mono 8
+font pango:DejaVu Sans Mono 8
 
 # Before i3 v4.8, we used to recommend this one as the default:
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
@@ -46,7 +46,7 @@ bindsym $mod+d exec dmenu_run
 bindsym $mod+j focus left
 bindsym $mod+k focus down
 bindsym $mod+l focus up
-bindsym $mod+ntilde focus right
+bindsym $mod+semicolon focus right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
@@ -58,7 +58,7 @@ bindsym $mod+Right focus right
 bindsym $mod+Shift+j move left
 bindsym $mod+Shift+k move down
 bindsym $mod+Shift+l move up
-bindsym $mod+Shift+ntilde move right
+bindsym $mod+Shift+semicolon move right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Shift+Left move left
@@ -94,16 +94,16 @@ bindsym $mod+a focus parent
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
-set $ws1 "1 "
+set $ws1 "1 "
 set $ws2 "2 "
-set $ws3 "3  "
+set $ws3 "3  "
 set $ws4 "4"
 set $ws5 "5"
-set $ws6 "6"
-set $ws7 "7"
+set $ws6 "6  "
+set $ws7 "7 "
 set $ws8 "8"
 set $ws9 "9"
-set $ws10 "10 "
+set $ws10 "10"
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -148,7 +148,7 @@ mode "resize" {
         bindsym j resize shrink width 10 px or 10 ppt
         bindsym k resize grow height 10 px or 10 ppt
         bindsym l resize shrink height 10 px or 10 ppt
-        bindsym ntilde resize grow width 10 px or 10 ppt
+        bindsym semicolon resize grow width 10 px or 10 ppt
 
         # same bindings, but for the arrow keys
         bindsym Left resize shrink width 10 px or 10 ppt
@@ -187,10 +187,14 @@ mode "$mode_system" {
 bindsym $mod+Shift+p mode "$mode_system"
 
 # screens management
-set $mode_screen Screen (v) VGA on, (x) VGA off
+set $mode_screen Screen (f) add first monitor, (s) add second monitor, (b) both, (z) remove first monitor, (x) remove second monitor
 mode  "$mode_screen" {
-	bindsym v exec --no-startup-id xrandr --output DP-1 --auto --right-of eDP-1 --scale 2x2, mode "default"
-	bindsym x exec --no-startup-id xrandr --output DP-1 --off, mode "default"
+	# bindsym v exec --no-startup-id xrandr --output DP-1 --auto --right-of eDP-1 --scale 2x2, mode "default"
+	bindsym f exec --no-startup-id sh ~/.config/i3/i3_monitors.sh first,  mode "default"
+	bindsym s exec --no-startup-id sh ~/.config/i3/i3_monitors.sh second, mode "default"
+	bindsym b exec --no-startup-id sh ~/.config/i3/i3_monitors.sh both, mode "default"
+	bindsym z exec --no-startup-id xrandr --output DP-1-1 --off, mode "default"
+	bindsym x exec --no-startup-id xrandr --output DP-1-2 --off, mode "default"
 	bindsym Escape mode "default"
 }
 bindsym $mod+Shift+d mode "$mode_screen"
@@ -204,27 +208,31 @@ exec synclient HorizScrollDelta=-27
 bindsym $mod+Shift+x exec i3lock
 
 # media controls
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%  # increase volume
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5%  # decrease volume
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle  # toggle mute
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%  # increase volume
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%  # decrease volume
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle  # toggle mute
 
 # execute moc player
 bindsym $mod+Shift+m exec i3-sensible-terminal -T MOC --command=mocp, workspace $ws10
+bindsym $mod+Shift+s exec --no-startup-id i3-msg workspace $ws1; exec spotify
 
-# assign defaults workspaces
-assign [class="Firefox"] $ws1
-assign [class="X-terminal-emulator" title="MOC"] $ws10
-assign [class="X-terminal-emulator"] $ws2
-assign [class="jetbrains-pycharm"] $ws3
-
-
+# assign workspaces to screens
 workspace $ws1 output eDP-1
-workspace $ws2 output eDP-1
-workspace $ws3 output eDP-1
-workspace $ws4 output eDP-1
-workspace $ws5 output eDP-1
-workspace $ws6 output DP-1
-workspace $ws7 output DP-1
-workspace $ws8 output DP-1
-workspace $ws9 output DP-1
-workspace $ws10 output DP-1
+workspace $ws2 output DP-1-1
+workspace $ws3 output DP-1-1
+workspace $ws4 output DP-1-1
+workspace $ws5 output DP-1-1
+workspace $ws6 output DP-1-2
+workspace $ws7 output DP-1-2
+workspace $ws8 output DP-1-2
+workspace $ws9 output DP-1-2
+workspace $ws10 output DP-1-2
+
+# assign application to defaults workspaces
+assign [class="^Spotify$" instance="^spotify$"] $ws1
+assign [class="X-terminal-emulator"] $ws2
+assign [class="firefox"] $ws3
+assign [class="Signal"] $ws4
+assign [class="Telegram"] $ws4
+assign [class="jetbrains-pycharm"] $ws6
+assign [class="X-terminal-emulator" title="MOC"] $ws10
